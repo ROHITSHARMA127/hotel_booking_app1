@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hotel_booking_app/register_screen.dart';
 import 'package:hotel_booking_app/widgets/custom_widget.dart';
 import 'package:provider/provider.dart';
-import 'auth_provider.dart';
+import 'auth_provider/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

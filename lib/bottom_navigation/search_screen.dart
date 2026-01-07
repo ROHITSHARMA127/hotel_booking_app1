@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -22,6 +22,55 @@ class _SearchScreenState extends State<SearchScreen> {
     "Lucknow",
     "Ahmedabad",
   ];
+
+  DateTime? checkInDate;
+  DateTime? checkOutDate;
+
+  @override
+  void initState() {
+    super.initState();
+    checkInDate = DateTime.now();
+    checkOutDate = DateTime.now().add(Duration(days: 1));
+  }
+
+  int getNights() {
+    return checkOutDate!.difference(checkInDate!).inDays;
+  }
+
+  Future pickCheckInDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: checkInDate!,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        checkInDate = picked;
+        checkOutDate = picked.add(Duration(days: 1)); // default 1 night
+      });
+    }
+  }
+
+  Future pickCheckOutDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: checkOutDate!,
+      firstDate: checkInDate!,
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        checkOutDate = picked;
+      });
+    }
+  }
+
+  String formatDate(DateTime date) {
+    return DateFormat('dd MMM').format(date);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,22 +95,36 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  /// ---- DATE ROW ----
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(onPressed: () {}, child: const Text("Today")),
-                      const Text("1N"),
+                      /// TODAY / CHECK-IN
                       TextButton(
-                        onPressed: () {},
-                        child: const Text("Tomorrow"),
+                        onPressed: pickCheckInDate,
+                        child: Text(formatDate(checkInDate!)),
                       ),
+
+                      /// Nights Count
+                      Text("${getNights()}N"),
+
+                      /// TOMORROW / CHECK-OUT
+                      TextButton(
+                        onPressed: pickCheckOutDate,
+                        child: Text(formatDate(checkOutDate!)),
+                      ),
+
                       Container(height: 20, width: 1, color: Colors.grey),
+
+                      /// Rooms & Guests (static for now)
                       TextButton(
                         onPressed: () {},
                         child: const Text("1 room 1 guest"),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
@@ -83,6 +146,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
+
+            /// City list
             Expanded(
               child: ListView.builder(
                 itemCount: cityName.length,

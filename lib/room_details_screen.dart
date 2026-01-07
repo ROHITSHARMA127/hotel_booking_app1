@@ -127,3 +127,81 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
     );
   }
 }
+
+
+
+// import 'package:flutter/material.dart';
+// import '../api/room_api_service.dart';
+// import '../models/room_model.dart';
+//
+// class RoomsScreen extends StatefulWidget {
+//   final int hotelId;
+//   final String hotelName;
+//
+//   const RoomsScreen({
+//     super.key,
+//     required this.hotelId,
+//     required this.hotelName,
+//   });
+//
+//   @override
+//   State<RoomsScreen> createState() => _RoomsScreenState();
+// }
+//
+// class _RoomsScreenState extends State<RoomsScreen> {
+//   final RoomApiService api = RoomApiService();
+//   late Future<List<RoomModel>> roomsFuture;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     roomsFuture = api.fetchRooms(widget.hotelId);
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("${widget.hotelName} Rooms"),
+//       ),
+//       body: FutureBuilder<List<RoomModel>>(
+//         future: roomsFuture,
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return const Center(child: CircularProgressIndicator());
+//           }
+//
+//           if (snapshot.hasError) {
+//             return Center(child: Text("Error: ${snapshot.error}"));
+//           }
+//
+//           final rooms = snapshot.data!;
+//
+//           if (rooms.isEmpty) {
+//             return const Center(child: Text("No rooms available"));
+//           }
+//
+//           return ListView.builder(
+//             itemCount: rooms.length,
+//             itemBuilder: (context, index) {
+//               final room = rooms[index];
+//               return Card(
+//                 margin: const EdgeInsets.all(10),
+//                 child: ListTile(
+//                   leading: Image.network(
+//                     room.imageUrl,
+//                     width: 60,
+//                     fit: BoxFit.cover,
+//                   ),
+//                   title: Text(room.roomType),
+//                   subtitle: Text("₹${room.price} / night"),
+//                 ),
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+
