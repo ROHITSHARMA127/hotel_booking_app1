@@ -38,6 +38,15 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.5.3
   intl: ^0.20.2
+  razorpay_flutter: ^1.4.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/Rx hotel logo.jpg"
+
+
 
 
 
@@ -65,9 +74,15 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/kolkata.jpg
+    - assets/Rx hotel logo.jpg
+    - assets/banglore.jpg
+    - assets/chennai.jpg
+    - assets/mumbai.jpg
+    - assets/newdelhi.jpg
+    - assets/Patna.jpg
+    - assets/pngtree-vector-location-icon-png-image_1028445.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
