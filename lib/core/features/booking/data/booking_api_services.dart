@@ -10,7 +10,7 @@ class BookingApiService {
     required String checkIn,
     required String checkOut,
     required double totalPrice,
-    required int guests,
+    required int guests, required String bookingName,
   }) async {
     final url = Uri.parse("https://hotelbooking.edugaondev.com/api/booking/create");
 

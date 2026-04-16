@@ -178,6 +178,8 @@ class _HotelListScreenState extends State<HotelListScreen> {
                                 hotelId: hotel.id,
                                 hotelName: hotel.name,
                                 hotelPrice: hotel.price,
+                                hotelAmenities: hotel.amenities,
+                                hotelAbout: hotel.about,
                               ),
                             ),
                           );
@@ -241,7 +243,6 @@ class _HotelListScreenState extends State<HotelListScreen> {
                                   ],
                                 ),
                               ),
-
                               // 📄 Details
                               Padding(
                                 padding: const EdgeInsets.all(12),

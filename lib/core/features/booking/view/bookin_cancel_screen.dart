@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class BookinCancelScreen extends StatefulWidget {
+class BookingCancelScreen extends StatefulWidget {
   final int bookingId;
-  const BookinCancelScreen(this.bookingId, {super.key});
+  const BookingCancelScreen(this.bookingId, {super.key});
 
   @override
-  State<BookinCancelScreen> createState() => _BookinCancelScreenState();
+  State<BookingCancelScreen> createState() => _BookingCancelScreenState();
 }
 
-class _BookinCancelScreenState extends State<BookinCancelScreen> {
+class _BookingCancelScreenState extends State<BookingCancelScreen> {
   bool isLoading = false;
   bool isSuccess = false;
   String error = "";

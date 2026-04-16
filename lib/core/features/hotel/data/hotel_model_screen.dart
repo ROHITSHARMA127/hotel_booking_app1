@@ -6,6 +6,8 @@ class HotelModel {
   final String price;
   final String rating;
   final String imageUrl;
+  final String amenities;
+  final String about;
 
   HotelModel({
     required this.id,
@@ -15,6 +17,8 @@ class HotelModel {
     required this.price,
     required this.rating,
     required this.imageUrl,
+    required this.amenities,
+    required this.about,
   });
 
   factory HotelModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class HotelModel {
       price: json['price']?.toString() ?? '0',
       rating: json['rating']?.toString() ?? '0',
       imageUrl: json['imageUrl'] ?? '',
+      amenities: json['amenities'] ?? '',
+      about: json['about'] ?? '',
     );
   }
 
@@ -38,6 +44,8 @@ class HotelModel {
       'price': price,
       'rating': rating,
       'imageUrl': imageUrl,
+      'amentites': amenities,
+      'about': about,
     };
   }
 }

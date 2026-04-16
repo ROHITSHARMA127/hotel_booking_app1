@@ -58,7 +58,7 @@ class _SearchHotelScreenState extends State<SearchHotelScreen> {
                   builder: (_) => RoomDetailsScreen(
                     hotelId: hotel.id,
                     hotelName: hotel.name,
-                    hotelPrice: hotel.price,
+                    hotelPrice: hotel.price, hotelAmenities: '', hotelAbout: '',
                   ),
                 ),
               );

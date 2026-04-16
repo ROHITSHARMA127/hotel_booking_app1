@@ -1,4 +1,4 @@
-// BookingHistoryScreen - Simple UI Version
+// BookingHistoryScreen - Improved & Production Ready
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +16,9 @@ class BookingHistoryScreen extends StatefulWidget {
 class _BookingHistoryScreenState extends State<BookingHistoryScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
   List<Booking> allBookings = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -27,36 +29,63 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
 
   Future<void> fetchBookings() async {
     try {
+      setState(() => isLoading = true);
+
       final uri = Uri.parse(
         "https://hotelbooking.edugaondev.com/api/booking/user/${widget.userId}",
       );
+
       final response = await http.get(
         uri,
         headers: {'Accept': 'application/json'},
       );
+
       final body = response.body.trim();
 
       if (!body.startsWith("{") && !body.startsWith("[")) {
-        throw Exception("Invalid response from server");
+        throw Exception("Invalid server response");
       }
 
       final data = json.decode(body);
+
       if (data is Map && data['data'] is List) {
-        final bookingsList = data['data'] as List;
         setState(() {
-          allBookings = bookingsList.map((e) => Booking.fromJson(e)).toList();
+          allBookings =
+              (data['data'] as List).map((e) => Booking.fromJson(e)).toList();
         });
       }
     } catch (e) {
-      print("Error fetching bookings: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to load bookings")),
+      );
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
-  List<Booking> pendingBookings() =>
-      allBookings.where((b) => b.status.toLowerCase() == "pending").toList();
+  List<Booking> pendingBookings() => allBookings
+      .where((b) => b.status.toLowerCase() == "pending")
+      .toList();
 
-  List<Booking> cancelledBookings() =>
-      allBookings.where((b) => b.status.toLowerCase() == "cancelled").toList();
+  List<Booking> cancelledBookings() => allBookings
+      .where((b) => b.status.toLowerCase() == "cancelled")
+      .toList();
+
+  String formatDate(DateTime date) =>
+      "${date.day}-${date.month}-${date.year}";
+
+  Color statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case "cancelled":
+        return Colors.red;
+      case "pending":
+        return Colors.orange;
+      case "confirmed":
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,21 +95,23 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
         title: const Text("My Booking History"),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
           tabs: const [
             Tab(text: "Pending"),
             Tab(text: "Cancelled"),
           ],
         ),
       ),
-      body: RefreshIndicator(
-        color: Colors.deepPurple,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
         onRefresh: fetchBookings,
         child: TabBarView(
           controller: _tabController,
           children: [
-            buildBookingList(pendingBookings(), key: ValueKey("pending")),
-            buildBookingList(cancelledBookings(), key: ValueKey("cancelled")),
+            buildBookingList(pendingBookings(),
+                key: const ValueKey("pending")),
+            buildBookingList(cancelledBookings(),
+                key: const ValueKey("cancelled")),
           ],
         ),
       ),
@@ -94,9 +125,13 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
         children: const [
           SizedBox(height: 120),
           Center(
-            child: Text(
-              "No bookings found",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            child: Column(
+              children: [
+                Icon(Icons.hotel_outlined, size: 60, color: Colors.grey),
+                SizedBox(height: 10),
+                Text("No bookings found",
+                    style: TextStyle(color: Colors.grey)),
+              ],
             ),
           ),
         ],
@@ -109,47 +144,41 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
       itemCount: bookings.length,
       itemBuilder: (context, index) {
         final booking = bookings[index];
-        final isCancelled = booking.status == "cancelled";
+        final isCancelled =
+            booking.status.toLowerCase() == "cancelled";
 
         return Card(
           margin: const EdgeInsets.symmetric(vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Hotel Name + Status
+                // Hotel name + status
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Flexible(
+                    Expanded(
                       child: Text(
                         "${booking.hotelName} (${booking.city})",
                         style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isCancelled ? Colors.red : Colors.orange,
+                        color: statusColor(booking.status),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         booking.status.toUpperCase(),
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
+                            color: Colors.white, fontSize: 12),
                       ),
                     ),
                   ],
@@ -157,68 +186,22 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
                 const SizedBox(height: 6),
                 Text("Room: ${booking.roomName}"),
                 const SizedBox(height: 4),
-                Text(
-                  "Check-in: ${booking.checkIn.toLocal().toString().split(' ')[0]}",
-                ),
-                Text(
-                  "Check-out: ${booking.checkOut.toLocal().toString().split(' ')[0]}",
-                ),
+                Text("Check-in: ${formatDate(booking.checkIn)}"),
+                Text("Check-out: ${formatDate(booking.checkOut)}"),
                 const SizedBox(height: 4),
                 Text("Guests: ${booking.guests}"),
                 Text("Total: ₹${booking.totalPrice.toStringAsFixed(0)}"),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
+
                 if (!isCancelled)
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton.icon(
-                      icon: const Icon(Icons.cancel, color: Colors.red),
-                      label: const Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      onPressed: () async {
-                        showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text("Cancel Booking"),
-                            content: const Text(
-                              "Are you sure you want to cancel this booking?",
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("No"),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                ),
-                                child: const Text("Yes, Cancel"),
-                                onPressed: () async {
-                                  Navigator.pop(context);
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          BookinCancelScreen(booking.id),
-                                    ),
-                                  );
-                                  if (result == true) {
-                                    setState(() {
-                                      allBookings.removeWhere(
-                                        (b) => b.id == booking.id,
-                                      );
-                                      allBookings.add(
-                                        booking.copyWith(status: "cancelled"),
-                                      );
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      icon:
+                      const Icon(Icons.cancel, color: Colors.red),
+                      label: const Text("Cancel",
+                          style: TextStyle(color: Colors.red)),
+                      onPressed: () => showCancelDialog(booking),
                     ),
                   ),
               ],
@@ -226,6 +209,50 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen>
           ),
         );
       },
+    );
+  }
+
+  void showCancelDialog(Booking booking) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Cancel Booking"),
+        content:
+        const Text("Are you sure you want to cancel this booking?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("No"),
+          ),
+          ElevatedButton(
+            style:
+            ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Yes, Cancel"),
+            onPressed: () async {
+              Navigator.pop(context);
+
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BookingCancelScreen(booking.id),
+                ),
+              );
+              if (result == true) {
+                setState(() {
+                  final index = allBookings
+                      .indexWhere((b) => b.id == booking.id);
+                  if (index != -1) {
+                    allBookings[index] =
+                        allBookings[index].copyWith(
+                          status: "cancelled",
+                        );
+                  }
+                });
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }

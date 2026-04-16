@@ -34,6 +34,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hotel_booking_app/core/features/booking/view/Booking_confirmed_screen.dart';
 import 'package:hotel_booking_app/core/features/hotel/provider/hotel_provider.dart';
 import 'package:hotel_booking_app/core/features/room/provider/room_provider.dart';
 import 'package:hotel_booking_app/core/features/hotel/view/hotel_list_screen.dart';

@@ -209,7 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             });
                           },
-                          child: const Text("Save Profile", style: TextStyle(fontSize: 18)),
+                          child: const Text("Save Profile", style: TextStyle(fontSize: 18, color: Colors.white)),
                         ),
 
                         const SizedBox(height: 15),
@@ -221,7 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           ),
                           onPressed: _logout,
-                          child: const Text("Logout"),
+                          child: const Text("Logout",style: TextStyle(color: Colors.red,fontSize: 18,fontWeight: FontWeight.bold),),
                         ),
                       ],
                     ),
